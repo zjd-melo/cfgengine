@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cfgengine"
+version = "1.0.0"
+description = "A simple Python library to manage and load configuration files"
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [
+    { name = "zjd-melo", email = "zhujiadong.melo@gmail.com" }
+]
+license = { file = "LICENSE" }
+keywords = ["config"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+
+[project.urls]
+Homepage = "https://github.com/zjd-melo/cfgengine"
+Repository = "https://github.com/zjd-melo/cfgengine.git"
+Issues = "https://github.com/zjd-melo/issues"
+
+
+[tool.setuptools]
+packages = ["cfgengine"]
+include-package-data = false
