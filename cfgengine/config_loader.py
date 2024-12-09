@@ -6,8 +6,8 @@ from cfgengine.utils import DotDict
 
 
 class ConfigLoader:
-    DEFAULT_CONFIG_FILE_VAR = "EASY_CONF"
-    DEFAULT_CONFIG_FILE_NAME = "easy_config.json"
+    DEFAULT_CONFIG_FILE_VAR = "CFGENGINE_CONF"
+    DEFAULT_CONFIG_FILE_NAME = "config_engine.json"
     DEFAULT_HOME_PATH = os.path.expanduser(f"~/.config/{DEFAULT_CONFIG_FILE_NAME}")
     DEFAULT_CURRENT_PATH = f"./{DEFAULT_CONFIG_FILE_NAME}"
 
