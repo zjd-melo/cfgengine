@@ -9,7 +9,7 @@
 ## Installation
 You can install cfgengine using pip:
 
-<!-- `pip install cfgengine` -->
+`pip install git+https://github.com/zjd-melo/cfgengine.git`
 
 ## Usage
 ### 1. Load Configuration
