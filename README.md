@@ -90,6 +90,7 @@ class YAMLParser(CfgParser):
         with open(file_path, 'r') as f:
             return yaml.safe_load(f)
 
+# Deprecated way
 # Register the custom parser
 ParserRegistry.register_parser("yaml", YAMLParser)
 ```
