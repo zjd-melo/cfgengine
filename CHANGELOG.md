@@ -4,14 +4,14 @@
 
 ### Added
 
-- 新增了 `@register_parser` 装饰器，用于自动注册解析器类到 `ParserRegistry` 中。
+- Added the `@register_parser` decorator for automatically registering parser classes to ParserRegistry.
 
 ### Changed
 
-- 重命名了以下类以避免和标准库中的类重名：
+- Renamed the following classes to avoid conflicts with standard library names:
   - `ConfigParser` -> `CfgParser`
-- 在所有解析器类上添加了 `@register_parser` 装饰器，简化了注册逻辑。
+- Applied the `@register_parser` decorator to all parser classes, simplifying the registration logic.
 
 ### Deprecated
 
-- `ParserRegistry.register_parser(extension, cls)` 方法的手动调用方式，推荐使用装饰器自动注册。
+- Manual invocation of the `ParserRegistry.register_parser(extension, cls)` method is now deprecated. Using the decorator for automatic registration is recommended.
