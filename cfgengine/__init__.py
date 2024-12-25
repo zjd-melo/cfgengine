@@ -1,4 +1,5 @@
 from .config_loader import ConfigLoader
-from .parser_registry import ConfigParser, ParserRegistry
+from .default_parser import INIParser, JSONParser
+from .parser_registry import CfgParser, ParserRegistry
 
-__all__ = ["ConfigParser", "ParserRegistry", "ConfigLoader"]
+__all__ = ["CfgParser", "ParserRegistry", "ConfigLoader"]

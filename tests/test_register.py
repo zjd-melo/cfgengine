@@ -2,10 +2,10 @@ import os
 import unittest
 
 from cfgengine.config_loader import ConfigLoader
-from cfgengine.parser_registry import ConfigParser, ParserRegistry
+from cfgengine.parser_registry import CfgParser, ParserRegistry
 
 
-class MockParser(ConfigParser):
+class MockParser(CfgParser):
     def parse(self, file_path):
         return {"mock": "data"}
 

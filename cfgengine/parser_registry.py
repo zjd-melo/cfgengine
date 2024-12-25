@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class ConfigParser(ABC):
+class CfgParser(ABC):
     @abstractmethod
     def parse(self, file_path):
         """Parse the configuration file and return the data as a dictionary."""
@@ -24,4 +24,10 @@ class ParserRegistry:
         return parser_class()
 
 
-from cfgengine.default_parser import INIParser, JSONParser
+def register_cfg_parser(extension):
+
+    def decorator(parser_cls):
+        ParserRegistry.register_parser(extension, parser_cls)
+        return parser_cls
+
+    return decorator

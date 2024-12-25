@@ -1,12 +1,12 @@
 import logging
-from configparser import ConfigParser
 
-from cfgengine.parser_registry import ParserRegistry
+from cfgengine.parser_registry import CfgParser, register_cfg_parser
 
 _logger = logging.getLogger(__name__)
 
 
-class JSONParser(ConfigParser):
+@register_cfg_parser("json")
+class JSONParser(CfgParser):
     def parse(self, file_path):
         import json
 
@@ -16,7 +16,9 @@ class JSONParser(ConfigParser):
             return json.load(f)
 
 
-class INIParser(ConfigParser):
+@register_cfg_parser("ini")
+@register_cfg_parser("INI")
+class INIParser(CfgParser):
     def parse(self, file_path):
         import configparser
 
@@ -24,8 +26,3 @@ class INIParser(ConfigParser):
         config = configparser.ConfigParser()
         config.read(file_path)
         return {section: dict(config[section]) for section in config.sections()}
-
-
-ParserRegistry.register_parser("json", JSONParser)
-ParserRegistry.register_parser("ini", INIParser)
-ParserRegistry.register_parser("INI", INIParser)
