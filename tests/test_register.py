@@ -2,11 +2,11 @@ import os
 import unittest
 
 from cfgengine.config_loader import ConfigLoader
-from cfgengine.parser_registry import CfgParser, ParserRegistry
+from cfgengine.parser import CfgParser, ParserRegistry
 
 
 class MockParser(CfgParser):
-    def parse(self, file_path):
+    def load(self):
         return {"mock": "data"}
 
 
@@ -14,13 +14,13 @@ class TestParserRegistry(unittest.TestCase):
     def test_register_and_get_parser(self):
         """Test registering and retrieving a parser."""
         ParserRegistry.register_parser("mock", MockParser)
-        parser = ParserRegistry.get_parser("mock")
-        self.assertIsInstance(parser, MockParser)
+        parser = ParserRegistry.get_parser_class("mock")
+        self.assertIs(parser, MockParser)
 
     def test_get_parser_not_registered(self):
         """Test retrieving a parser that is not registered."""
         with self.assertRaises(ValueError):
-            ParserRegistry.get_parser("unknown")
+            ParserRegistry.get_parser_class("unknown")
 
 
 class TestConfigLoader(unittest.TestCase):
