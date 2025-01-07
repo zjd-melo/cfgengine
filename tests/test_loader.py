@@ -2,13 +2,13 @@ import os
 import unittest
 
 from cfgengine.config_loader import ConfigLoader
-from cfgengine.parser_registry import CfgParser, ParserRegistry
+from cfgengine.parser import CfgParser, ParserRegistry
 
 
 class MockParser(CfgParser):
     """Mock parser for testing."""
 
-    def parse(self, file_path):
+    def load(self):
         return {"mock_key": "mock_value"}
 
 
