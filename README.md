@@ -1,4 +1,4 @@
-# Configuration Engine README
+# Configuration Engine
 
 ## Overview
 

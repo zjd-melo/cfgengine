@@ -29,3 +29,5 @@ __all__ = [
     "returns_native_non_string",
     "DotDict",
 ]
+
+version = "2.0.0"

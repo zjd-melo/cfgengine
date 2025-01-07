@@ -85,6 +85,7 @@ class TestINIParser(unittest.TestCase):
 class TestFunctionCallExtractor(unittest.TestCase):
     def test_extract_function_calls(self):
         from jinja2.nativetypes import NativeEnvironment
+
         env = NativeEnvironment()
         env.globals = {"my_func": lambda: None}
         extractor = FunctionCallExtractor(env)
