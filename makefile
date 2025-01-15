@@ -1,4 +1,4 @@
-.PHONY: build install uninstall publish_testpypi clean help
+.PHONY: build install uninstall publish_testpypi publish_pypi clean help
 
 PACKAGE_NAME := cfgengine
 
@@ -9,6 +9,7 @@ help:
 	@echo "  install            - Install the package locally"
 	@echo "  uninstall          - Uninstall the package"
 	@echo "  publish_testpypi   - Upload the package to TestPyPI"
+	@echo "  publish_pypi       - Upload the package to PyPI"
 	@echo "  help               - Display this help message"
 
 build:
@@ -35,3 +36,11 @@ publish_testpypi:
 		exit 1; \
 	fi
 	@twine upload --verbose --repository testpypi dist/* || { echo "Upload failed. Ensure 'twine' is installed: pip install twine"; exit 1; }
+
+publish_pypi:
+	@echo "Uploading $(PACKAGE_NAME) to PyPI..."
+	@if [ ! -d "dist" ]; then \
+		echo "Error: 'dist' directory not found. Run 'make build' first."; \
+		exit 1; \
+	fi
+	@twine upload --verbose --repository pypi dist/* || { echo "Upload failed. Ensure 'twine' is installed: pip install twine"; exit 1; }

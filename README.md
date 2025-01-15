@@ -24,10 +24,8 @@ This project provides a robust and extensible configuration engine for managing 
 
 ## Installation
 
-Clone the repository and install the required dependencies:
-
 ```bash
-pip install -r requirements.txt
+pip install cfgengine
 ```
 
 ## Usage
