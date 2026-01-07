@@ -7,20 +7,24 @@ from collections import defaultdict
 from jinja2 import UndefinedError, nodes
 from jinja2.nativetypes import NativeEnvironment
 
-# Default Jinja2 NativeEnvironment
+# 默认使用的 Jinja2 NativeEnvironment（支持返回原生 Python 类型）
 _default_env = NativeEnvironment()
 
 
 def custom_warning_format(message, category, filename, lineno, line=None):
+    """
+    自定义 warnings 的输出格式
+    """
     return f"{filename}:{lineno}: {category.__name__}: {message}\n"
 
 
+# 覆盖 warnings 的默认格式化方式
 warnings.formatwarning = custom_warning_format
 
 
 class CfgParser(ABC):
     """
-    Abstract base class for configuration parsers.
+    配置解析器的抽象基类
     """
 
     def __init__(self, file_path):
@@ -28,14 +32,16 @@ class CfgParser(ABC):
 
     def parse(self, jinja_env=_default_env):
         """
-        Parse the configuration file and return the data as a DotDict.
-        If the provided Jinja environment is not a NativeEnvironment, issue a warning.
+        解析配置文件并返回 DotDict 对象。
+
+        如果传入的 Jinja 环境不是 NativeEnvironment，
+        将发出警告，因为这可能导致渲染结果全部为字符串。
         """
         if not issubclass(jinja_env.__class__, NativeEnvironment):
             warnings.warn(
-                "The provided Jinja environment is not NativeEnvironment. "
-                "This may result in rendering output as strings only. "
-                "If you need native Python objects, consider using NativeEnvironment.",
+                "传入的 Jinja 环境不是 NativeEnvironment，"
+                "这可能导致模板渲染结果只能是字符串。"
+                "如果需要返回原生 Python 对象，请使用 NativeEnvironment。",
                 UserWarning,
             )
         cfg = self.load()
@@ -45,36 +51,37 @@ class CfgParser(ABC):
     @abstractmethod
     def load(self):
         """
-        Load and return the configuration as a dictionary.
-        Must be implemented by subclasses.
+        加载并返回配置内容（dict）。
+
+        子类必须实现该方法。
         """
         pass
 
 
 class ParserRegistry:
     """
-    Registry for associating file extensions with parser classes.
+    解析器注册表，用于维护文件扩展名与解析器类的映射关系
     """
 
     _parsers = {}
 
     @classmethod
     def register_parser(cls, extension, parser_clz):
-        """Register a parser for a specific file extension."""
+        """为指定的文件扩展名注册解析器"""
         cls._parsers[extension] = parser_clz
 
     @classmethod
     def get_parser_class(cls, extension):
-        """Retrieve the parser class associated with a file extension."""
+        """根据文件扩展名获取对应的解析器类"""
         parser_class = cls._parsers.get(extension)
         if not parser_class:
-            raise ValueError(f"No parser registered for extension: {extension}")
+            raise ValueError(f"未找到对应扩展名的解析器: {extension}")
         return parser_class
 
 
 class ParserError(Exception):
     """
-    Custom exception for parser-related errors.
+    配置解析相关的自定义异常
     """
 
     pass
@@ -82,11 +89,15 @@ class ParserError(Exception):
 
 class DotDict(dict):
     """
-    A dictionary that allows attribute-style access.
+    支持“点号访问”的字典对象
+
+    示例：
+        cfg.db.host 等价于 cfg["db"]["host"]
     """
 
     def __init__(self, dictionary):
         super().__init__(dictionary)
+        # 将嵌套 dict 递归转换为 DotDict
         for key, value in self.items():
             if isinstance(value, dict):
                 self[key] = DotDict(value)
@@ -94,7 +105,7 @@ class DotDict(dict):
     def __getattr__(self, name):
         if name in self:
             return self[name]
-        raise AttributeError(f"DotDict object has no attribute '{name}'")
+        raise AttributeError(f"DotDict 对象不存在属性 '{name}'")
 
     def __setattr__(self, name, value):
         self[name] = value
@@ -103,12 +114,12 @@ class DotDict(dict):
         if name in self:
             del self[name]
         else:
-            raise AttributeError(f"DotDict object has no attribute '{name}'")
+            raise AttributeError(f"DotDict 对象不存在属性 '{name}'")
 
 
 class FunctionCallExtractor:
     """
-    Extracts function calls from Jinja2 templates.
+    用于从 Jinja2 模板中提取函数调用信息
     """
 
     def __init__(self, env):
@@ -116,8 +127,7 @@ class FunctionCallExtractor:
 
     def extract(self, template_str):
         """
-        Parse a template string and extract all function calls defined in the Jinja
-        environment.
+        解析模板字符串，提取所有在 Jinja 环境中定义的函数调用
         """
         ast = self.env.parse(template_str)
         calls = defaultdict(list)
@@ -129,7 +139,6 @@ class FunctionCallExtractor:
                     and node.node.name in self.env.globals
                 ):
                     func_name = node.node.name
-                    # args = [arg.as_const() for arg in node.args]
                     calls[func_name].append(func_name)
             for child in node.iter_child_nodes():
                 visit_node(child)
@@ -140,7 +149,7 @@ class FunctionCallExtractor:
 
 class Parser:
     """
-    Responsible for parsing configuration data using Jinja2 templates.
+    使用 Jinja2 模板解析配置数据的核心解析器
     """
 
     def __init__(self, env):
@@ -148,14 +157,18 @@ class Parser:
         self.call_extractor = FunctionCallExtractor(env)
 
     def parse_config(self, config):
-        """Parse a configuration dictionary."""
+        """
+        解析配置字典
+        """
         parsed_config = {}
         for key, value in config.items():
             parsed_config[key] = self.parse_value(value, key)
         return parsed_config
 
     def parse_value(self, value, key):
-        """Recursively parse values in the configuration."""
+        """
+        递归解析配置中的值
+        """
         if isinstance(value, str):
             return self.parse_string(value, key)
         elif isinstance(value, list):
@@ -167,8 +180,10 @@ class Parser:
 
     def parse_string(self, value, key):
         """
-        Parse a string value as a Jinja2 template.
-        Raises a ParserError if multiple non-string-returning functions are detected.
+        将字符串按 Jinja2 模板进行渲染
+
+        如果检测到同一个模板中使用了多个返回非字符串的函数，
+        将抛出 ParserError。
         """
         try:
             function_calls = self.call_extractor.extract(value)
@@ -180,23 +195,25 @@ class Parser:
 
             if len(non_string_functions) > 1:
                 raise ParserError(
-                    f"Template error for key '{key}': Multiple non-string-returning"
-                    f"functions cannot be used together in the same template. Found: "
-                    f"{', '.join(non_string_functions)}"
+                    f"配置项 '{key}' 模板错误："
+                    f"同一个模板中不能同时使用多个返回非字符串的函数。"
+                    f"检测到: {', '.join(non_string_functions)}"
                 )
 
             return self.env.from_string(value).render()
         except UndefinedError as e:
-            raise ValueError(f"Error rendering template for key '{key}': {e}")
+            raise ValueError(f"渲染配置项 '{key}' 时发生错误: {e}")
 
     def parse_list(self, lst, key):
-        """Parse a list of values."""
+        """
+        解析列表类型的配置值
+        """
         return [self.parse_value(item, f"{key}[{i}]") for i, item in enumerate(lst)]
 
 
 def register_global_function(env=_default_env, name=None):
     """
-    Decorator to register a global function in the Jinja environment.
+    将函数注册为 Jinja2 全局函数的装饰器
     """
 
     def decorator(func):
@@ -209,7 +226,7 @@ def register_global_function(env=_default_env, name=None):
 
 def register_filter(env=_default_env, name=None):
     """
-    Decorator to register a filter in the Jinja environment.
+    将函数注册为 Jinja2 过滤器的装饰器
     """
 
     def decorator(func):
@@ -222,7 +239,7 @@ def register_filter(env=_default_env, name=None):
 
 def register_cfg_parser(extension):
     """
-    Decorator to register a configuration parser for a specific file extension.
+    注册配置解析器的装饰器（按文件扩展名）
     """
 
     def decorator(parser_cls):
@@ -234,7 +251,7 @@ def register_cfg_parser(extension):
 
 def returns_native_non_string(func):
     """
-    Decorator to mark a function as returning a native (non-string) object.
+    标记函数返回的是原生 Python 对象（非字符串）
     """
     func.returns_native = True
     return func
@@ -244,7 +261,11 @@ def returns_native_non_string(func):
 @returns_native_non_string
 def import_py_obj(path):
     """
-    Import a Python module or object by its dotted path.
+    根据点路径导入 Python 模块或对象
+
+    示例：
+        {{ import_py_obj("os.path") }}
+        {{ import_py_obj("datetime.datetime") }}
     """
     try:
         if "." not in path:
@@ -254,12 +275,12 @@ def import_py_obj(path):
             module = importlib.import_module(module_name)
             return getattr(module, obj)
     except (ImportError, AttributeError) as e:
-        raise ValueError(f"Unable to import '{path}': {e}")
+        raise ValueError(f"无法导入 '{path}': {e}")
 
 
 @register_global_function()
 def env_var(var_name, default=""):
     """
-    Retrieve an environment variable, returning a default value if not found.
+    获取环境变量，如果不存在则返回默认值
     """
     return os.getenv(var_name, default)

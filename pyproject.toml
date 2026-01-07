@@ -3,14 +3,13 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cfgengine"
-version = "2.0.0"
+name = "xr-cfgengine"
+version = "2.1.0"
 description = "A simple Python library to manage and load configuration files"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
-    { name = "zjd-melo", email = "zhujiadong.melo@gmail.com" }
+    { name = "xr", email = "xr@xrwangluo.com" }
 ]
-license = { file = "LICENSE" }
 keywords = ["config"]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -18,15 +17,28 @@ classifiers = [
     "Operating System :: OS Independent"
 ]
 
-dependencies = ["jinja2>=3.0.0"]
+dependencies = [
+    "jinja2>=3.0.0"
+]
+
+[project.optional-dependencies]
+nacos = ["nacos-sdk-python=1.0.0"]
+
 
 
 [project.urls]
-Homepage = "https://github.com/zjd-melo/cfgengine"
-Repository = "https://github.com/zjd-melo/cfgengine.git"
-Issues = "https://github.com/zjd-melo/cfgengine/issues"
+Homepage = "https://gitlab.xurongwl.com/datascience/cfgengine"
+Repository = "https://gitlab.xurongwl.com/datascience/cfgengine/-/tree/main"
+Issues = "https://gitlab.xurongwl.com/datascience/cfgengine/-/issues"
 
 
-[tool.setuptools]
-packages = ["cfgengine"]
-include-package-data = false
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+# 添加 src 到 sys.path
+pythonpath = ["src"]
+addopts = "-v -s --tb=short"

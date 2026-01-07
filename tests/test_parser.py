@@ -2,14 +2,14 @@ import os
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
 
-from cfgengine import (
+from xr.cfgengine import (
     DotDict,
     INIParser,
     JSONParser,
     ParserRegistry,
     returns_native_non_string,
 )
-from cfgengine.parser import FunctionCallExtractor, Parser
+from xr.cfgengine.parser import FunctionCallExtractor, Parser
 
 
 class TestDotDict(unittest.TestCase):

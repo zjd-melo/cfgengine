@@ -1,8 +1,8 @@
 import os
 import unittest
 
-from cfgengine.config_loader import ConfigLoader
-from cfgengine.parser import CfgParser, ParserRegistry
+from xr.cfgengine.config_loader import ConfigLoader
+from xr.cfgengine.parser import CfgParser, ParserRegistry
 
 
 class MockParser(CfgParser):

@@ -1,1 +1,2 @@
 jinja2 >= 3.0.0
+nacos-sdk-python==1.0.0
